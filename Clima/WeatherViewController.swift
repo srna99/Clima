@@ -10,6 +10,7 @@ import UIKit
 import CoreLocation
 import Alamofire
 import SwiftyJSON
+import SVProgressHUD
 
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
     
@@ -38,6 +39,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
+        SVProgressHUD.show()
     }
     
     
@@ -55,6 +57,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 let weatherJSON : JSON = JSON(response.result.value!)
                 
                 self.updateWeatherData(json: weatherJSON)
+                SVProgressHUD.dismiss()
             }
             else {
                 print("Error \(String(describing: response.result.error))")
@@ -72,7 +75,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //Write the updateWeatherData method here:
     func updateWeatherData(json : JSON) {
-        
+
         if let temperature = json["main"]["temp"].double {
             
             weatherDataModel.temperature = Int(temperature - 273.15)
@@ -151,6 +154,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         let params : [String : String] = ["q" : city, "appid" : APP_ID]
         
+        SVProgressHUD.show()
         getWeatherData(url: WEATHER_URL, parameters: params)
         
     }
