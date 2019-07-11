@@ -27,6 +27,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var temperatureLabel: UILabel!
+    @IBOutlet weak var degreesSwitch: UISwitch!
     
     
     override func viewDidLoad() {
@@ -71,7 +72,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //Write the updateWeatherData method here:
     func updateWeatherData(json : JSON) {
-        print(json)
+        
         if let temperature = json["main"]["temp"].double {
             
             weatherDataModel.temperature = Int(temperature - 273.15)
@@ -89,12 +90,24 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //MARK: - UI Updates
     /***************************************************************/
     
+    @IBAction func degreesChanged(_ sender: UISwitch) {
+        
+        updateUIWithWeatherData()
+        
+    }
     
     //Write the updateUIWithWeatherData method here:
     func updateUIWithWeatherData() {
         
+        if degreesSwitch.isOn {
+            weatherDataModel.convertedTemp = Int((Double(weatherDataModel.temperature) * 1.8) + 32)
+            temperatureLabel.text = "\(weatherDataModel.convertedTemp)°"
+        }
+        else {
+            temperatureLabel.text = "\(weatherDataModel.temperature)°"
+        }
+        
         cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = String(weatherDataModel.temperature)
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
         
     }
@@ -115,7 +128,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             let latitude = location.coordinate.latitude
             let longitude = location.coordinate.longitude
             
-            let params : [String : String] = ["lat" : String(latitude), "lon" : String(longitude), "APPID" : APP_ID]
+            let params : [String : String] = ["lat" : String(latitude), "lon" : String(longitude), "appid" : APP_ID]
             
             getWeatherData(url: WEATHER_URL, parameters: params)
         }
@@ -136,7 +149,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the userEnteredANewCityName Delegate method here:
     func userEnteredANewCityName(city: String) {
         
+        let params : [String : String] = ["q" : city, "appid" : APP_ID]
         
+        getWeatherData(url: WEATHER_URL, parameters: params)
         
     }
     
@@ -153,5 +168,4 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
     
 }
-
 
